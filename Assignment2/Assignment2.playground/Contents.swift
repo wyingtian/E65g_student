@@ -360,8 +360,8 @@ func reduce2(_ rows: Int, _ cols: Int, combine: (Int, Int, Int) -> Int) -> Int  
 extension Grid {
     var numLiving: Int {
         return reduce2(self.rows, self.cols) { total, row, col in
-            // ** Replace the following line with your Problem 12 code
-            return 0
+            // ** Your Problem 12 code goes here! replace the following line
+            return self.cells[row][col].state == CellState.alive ? total + 1 : total
         }
     }
 }
