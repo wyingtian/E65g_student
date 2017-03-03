@@ -99,16 +99,10 @@ typealias Position = (row: Int, col: Int)
  Failure to follow all rules will result in zero credit.
 */
 enum CellState {
-    case empty
-    case alive
-    case born
-    case died
-    
+    case empty, alive, born, died
     var isAlive: Bool {
         switch self{
-        case .alive:
-            return true
-        case .born:
+        case .alive, .born:
             return true
         default:
             return false
@@ -124,8 +118,8 @@ enum CellState {
 */
 // A struct representing a Cell in Conway's Game of Life
 struct Cell {
-    var position: Position = (0,0)
-    var state: CellState = CellState.empty
+    var position = (row:0, col:0)
+    var state = CellState.empty
 }
 /*:
  ## Problem 4:
@@ -136,14 +130,13 @@ struct Cell {
  */
 // ** Your Problem 4.1 answer goes here **
 /*
- It indicate the function call parameter does not have to have a name
- */
+ It indicates no external label is used, no need to name the parameter in function call */
 /*:
  2. what is the type of the `transform` variable?
  */
 // ** Your Problem 4.2 answer goes here **
 /*
- a function
+ a function that takes to Int and return T
  */
 /*:
  3. what is the return type of `map2`?
@@ -182,7 +175,7 @@ func map2<T>(_ rows: Int, _ cols: Int, transform: (Int, Int) -> T) -> [[T]] {
 */
 // ** Your Problem 5 comment goes here! **
 /*
- It represents the eight neighbours that the cell interact with
+ It represents the offsets of the eight neighbours that the cell interact with
  */
 /*:
  ## Problem 6:
@@ -228,14 +221,14 @@ struct Grid {
     var cols: Int = 10
     var cells: [[Cell]] = [[Cell]]()
     
-    
+
     init(_ rows: Int,
          _ cols: Int,
         cellInitializer: (Int, Int) -> CellState = { _,_ in .empty } ){
         // ** Your Problem 7 code goes here! **
         self.rows = rows
         self.cols = cols
-        self.cells = [[Cell]](repeating: [Cell](repeating: Cell(), count:cols), count: rows)
+        self.cells = [[Cell]](repeatElement([Cell](repeatElement(Cell(), count: cols)), count: rows))
         map2(rows, cols) { row, col in
             // ** Your Problem 8 code goes here! **
             cells[row][col].position = (row, col)
@@ -243,6 +236,7 @@ struct Grid {
         }
     }
 }
+
 /*:
  The next two problems apply to the extension to `Grid` immediately below.
  
@@ -288,6 +282,7 @@ struct Grid {
 /*
  when trying to get the position of the cell
  */
+
 // An extension of Grid to add a function for computing the positions
 // of the 8 neighboring cells of a given cell
 extension Grid {
@@ -296,22 +291,13 @@ extension Grid {
     func neighbors(of cell: Cell) -> [Position] {
         return Grid.offsets.map {
             // ** Your Problem 9 Code goes here! replace the following line **
-            let RowInGridOffset = ($0 + cell.position.0) % self.rows
-            let ColInGridOffset = ($1 + cell.position.1) % self.cols
-            if ( RowInGridOffset >= 0 && RowInGridOffset <= self.rows && ColInGridOffset >= 0 && ColInGridOffset <= self.cols){
-                return Position(row: $0 + cell.position.0, col: $1 + cell.position.1)
-            }else{
-                return Position(-5,-5)
-            }
+            let RowInGridOffset = ($0 + cell.position.0 + self.rows) % self.rows
+            let ColInGridOffset = ($1 + cell.position.1 + self.cols) % self.cols
+            return Position(row:RowInGridOffset, col: ColInGridOffset)
         }
     }
 }
-// test code
-//var c = Cell()
-//c.position = (9,9)
-//var g = Grid(9,9)
-//g.rows
-//g.neighbors(of : c)
+
 /*:
  ## Problem 11:
  I am providing the following function, reduce2. Answer the following questions
@@ -334,7 +320,7 @@ extension Grid {
  */
 // ** Your Problem 11.3 answer goes here **
 /*
- map2 need to initialize cell, here we just need the position of a cell
+unlike transform function returning T, the combine function returns Int
  */
 
 // A function which is useful for counting things in an array of arrays of things
@@ -429,8 +415,7 @@ extension Grid {
         get {
             // ** Your Problem 14 `get` code goes here! replace the following line **
             guard row < 0 || row >= self.rows || col < 0 || col >= self.cols else {
-                let res:Cell? = cells[row][col]
-                return  res
+               return cells[row][col]
             }
             return nil
         }
@@ -527,8 +512,6 @@ extension Grid {
             .reduce(0) {
                 guard let neighborCell = self[$1.row, $1.col] else { return $0 }
                 // ** Problem 18 code goes here!  replace the following 2 lines **
-                //neighborCell
-                //return $0
                 return neighborCell.state == .alive ? $0 + 1 : $0
         }
     }
