@@ -596,6 +596,7 @@ grid.numLiving
  ## For Fun
  Once you have everything above working, uncomment and think about the following lines of code
  */
+// It initilizes five cells, and the five cells constantly generate other five cells
 func gliderInitializer(row: Int, col: Int) -> CellState {
     switch (row, col) {
     case (0, 1), (1, 2), (2, 0), (2, 1), (2, 2): return .alive
