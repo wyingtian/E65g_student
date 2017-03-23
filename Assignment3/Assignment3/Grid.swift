@@ -24,7 +24,7 @@ public func positionSequence (from: Position, to: Position) -> PositionSequence 
 
 public enum CellState: String {
     case alive = "alive"
-    case empty="empty"
+    case empty = "empty"
     case born = "born"
     case died = "died"
     public func description() -> String {
@@ -197,4 +197,11 @@ func gliderInitializer(row: Int, col: Int) -> CellState {
     default: return .empty
     }
 }
+func allEmptyInitializer(row: Int, col: Int) -> CellState {
+    switch (row, col) {
+    default: return .empty
+    }
+}
+var gv = GridView()
+var theGrid = Grid(gv.getSize(), gv.getSize(), cellInitializer:gliderInitializer)
 

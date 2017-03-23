@@ -15,7 +15,7 @@
         <!--Simulation-->
         <scene sceneID="hNz-n2-bh7">
             <objects>
-                <viewController title="Simulation" id="9pv-A4-QxB" customClass="SimulationViewController" customModule="Assignment1" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Simulation" id="9pv-A4-QxB" customClass="SimulationViewController" customModule="Assignment3" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="aEv-9a-t9D"/>
                         <viewControllerLayoutGuide type="bottom" id="KYN-HO-if3"/>
@@ -27,18 +27,26 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eWM-xE-17y" userLabel="Shader">
                                 <rect key="frame" x="0.0" y="20" width="413" height="667"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="y5O-Ah-KeV" userLabel="LifeGrid" customClass="GridView" customModule="Assignment1" customModuleProvider="target">
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="y5O-Ah-KeV" userLabel="GridView" customClass="GridView" customModule="Assignment3" customModuleProvider="target">
                                         <rect key="frame" x="41.5" y="168.5" width="330" height="330"/>
                                         <color key="backgroundColor" red="0.77771369999999995" green="0.99012696899999997" blue="1" alpha="0.77726122359154926" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="y5O-Ah-KeV" secondAttribute="height" multiplier="1:1" id="EJv-dT-6JA"/>
                                         </constraints>
                                         <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="number" keyPath="size">
-                                                <integer key="value" value="9"/>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="livingColor">
+                                                <color key="value" red="0.0" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                     </view>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yA1-wO-RXs">
+                                        <rect key="frame" x="113" y="39" width="100" height="100"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="Step"/>
+                                        <connections>
+                                            <action selector="nextGrid:" destination="9pv-A4-QxB" eventType="touchUpInside" id="fQW-Im-jg5"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
@@ -63,15 +71,19 @@
                     <tabBarItem key="tabBarItem" title="Simulation" image="first" id="acW-dT-cKf" userLabel="Simulation"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="413" height="736"/>
+                    <connections>
+                        <outlet property="GridView" destination="y5O-Ah-KeV" id="ovu-3V-htp"/>
+                        <outlet property="buttonLabel" destination="yA1-wO-RXs" id="9j7-5B-3Ar"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="625" y="-450"/>
+            <point key="canvasLocation" x="623.4375" y="-450"/>
         </scene>
         <!--Instrumentation-->
         <scene sceneID="wg7-f3-ORb">
             <objects>
-                <viewController title="Instrumentation" id="8rJ-Kc-sve" customClass="InstrumentationViewController" customModule="Assignment1" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Instrumentation" id="8rJ-Kc-sve" customClass="InstrumentationViewController" customModule="Assignment3" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="L7p-HK-0SC"/>
                         <viewControllerLayoutGuide type="bottom" id="Djb-ko-YwX"/>

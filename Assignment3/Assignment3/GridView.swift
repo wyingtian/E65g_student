@@ -10,27 +10,26 @@ import UIKit
 
 @IBDesignable class GridView: UIView {
     
-    @IBInspectable var size:Int = 9
-    
+    @IBInspectable var size:Int = 5
     @IBInspectable var livingColor : UIColor = UIColor.green
     @IBInspectable var emptyColor : UIColor = UIColor.darkGray
     @IBInspectable var bornColor : UIColor = UIColor(red:0.0, green:1.0, blue:0.0, alpha:0.6)
     @IBInspectable var diedColor : UIColor = UIColor(white:0.333,alpha:0.6)
     @IBInspectable var gridColor : UIColor = UIColor.black
-    @IBInspectable var gridWith: CGFloat = 2.0
+    @IBInspectable var gridWith: CGFloat = 0.1
+ 
     
-    
-    func allEmptyInitializer(row: Int, col: Int) -> CellState {
-        switch (row, col) {
-        default: return .empty
-        }
+    func setGrid(_ newGrid:Grid){
+        theGrid = newGrid
+    }
+    func getSize() -> Int{
+        return size
     }
     override func draw(_ rect: CGRect) {
         let size = CGSize(
             width: rect.size.width / CGFloat(self.size),
             height: rect.size.height / CGFloat(self.size)
         )
-        var theGrid = Grid(self.size, self.size, cellInitializer:allEmptyInitializer)
        
         let base = rect.origin
         (0 ... self.size).forEach { i in
@@ -45,10 +44,12 @@ import UIKit
                 )
                 let p = Position(i,j)
                 switch theGrid[p].description() {
+                    
                 case "born" :
                     let path = UIBezierPath(ovalIn: subRect)
                     bornColor.setFill()
                     path.fill()
+                    
                 case "empty" :
                     let path = UIBezierPath(ovalIn: subRect)
                     emptyColor.setFill()
@@ -56,12 +57,12 @@ import UIKit
                    
                 case "alive" :
                     let path = UIBezierPath(ovalIn: subRect)
-                    bornColor.setFill()
+                    livingColor.setFill()
                     path.fill()
                    
                 case "died" :
                     let path = UIBezierPath(ovalIn: subRect)
-                    bornColor.setFill()
+                    diedColor.setFill()
                     path.fill()
                 default: break
                 }
@@ -81,11 +82,12 @@ import UIKit
             )
         }
     }
+    
     func drawLine(start:CGPoint, end: CGPoint) {
         let path = UIBezierPath()
         
         //set the path's line width to the height of the stroke
-        path.lineWidth = 2.0
+        path.lineWidth = gridWith
         
         //move the initial point of the path
         //to the start of the horizontal stroke
@@ -98,8 +100,18 @@ import UIKit
         gridColor.setStroke()
         path.stroke()
     }
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //lastTouchedPosition = process(touches: touches)
+        if let touch = touches.first {
+            let xPos = floor( touch.location(in:self).x / (self.bounds.size.width / CGFloat(self.size)))
+            
+            let yPos = floor( touch.location(in:self).y / (self.bounds.size.height / CGFloat(self.size)))
+            
+            let p = (Int(xPos),Int(yPos))
+            theGrid[p] = theGrid[p].toggle(theGrid[p])
+            setNeedsDisplay()
+        }
+        super.touchesBegan(touches, with: event)
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
