@@ -115,11 +115,9 @@ import UIKit
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //lastTouchedPosition = process(touches: touches)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //lastTouchedPosition = nil
     }
     
 }
