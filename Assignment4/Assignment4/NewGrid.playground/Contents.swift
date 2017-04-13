@@ -1,6 +1,3 @@
-//
-//  Grid.swift
-//
 import Foundation
 
 public typealias Position = (row: Int, col: Int)
@@ -22,14 +19,48 @@ public func positionSequence (from: Position, to: Position) -> PositionSequence 
         .flatMap { $0 }
 }
 
-
+public enum CellState: String {
+    case alive = "alive"
+    case empty="empty"
+    case born = "born"
+    case died = "died"
+    public func description() -> String {
+        switch self{
+        case .alive:
+            return rawValue
+        case .empty:
+            return rawValue
+        case .born:
+            return rawValue
+        case .died:
+            return rawValue
+        }
+    }
+    public func allValues() -> Array<String>{
+        return ["alive", "empty", "born", "died"]
+    }
+    public func toggle(_ value: CellState) -> CellState{
+        switch value{
+        case .alive, .born:
+            return .empty
+        case .died, .empty:
+            return .alive
+        }
+    }
+    public var isAlive: Bool {
+        switch self {
+        case .alive, .born: return true
+        default: return false
+        }
+    }
+}
 
 public struct Cell {
     var position = Position(row:0, col:0)
     var state = CellState.empty
 }
 
-public struct Grid : GridViewDataSource {
+public struct Grid {
     private var _cells: [[Cell]]
     fileprivate var modulus: Position { return Position(_cells.count, _cells[0].count) }
     
@@ -97,15 +128,8 @@ public extension Grid {
 extension Grid: Sequence {
     public struct SimpleGridIterator: IteratorProtocol {
         private var grid: Grid
-        
-        public init(grid: Grid) {
-            self.grid = grid
-        }
-        
-        public mutating func next() -> Grid? {
-            grid = grid.next()
-            return grid
-        }
+        public init(grid: Grid) { self.grid = grid }
+        public mutating func next() -> Grid? { return grid.next() }
     }
     
     public struct HistoricGridIterator: IteratorProtocol {
@@ -154,17 +178,24 @@ extension Grid: Sequence {
     }
 }
 
+
+/*
+ Testing
+ */
+var grid = Grid(10, 10) { _,_ in arc4random_uniform(3) == 2 ? .alive : .empty }
+print ("\(grid.living.count)\n\n\(grid.description)\n\n\n\n\n\n")
+
 func gliderInitializer(row: Int, col: Int) -> CellState {
     switch (row, col) {
     case (0, 1), (1, 2), (2, 0), (2, 1), (2, 2): return .alive
     default: return .empty
     }
 }
-func allEmptyInitializer(row: Int, col: Int) -> CellState {
-    switch (row, col) {
-    default: return .empty
-    }
-}
-//var gv = GridView()
-//var theGrid = Grid(gv.getSize(), gv.getSize(), cellInitializer:allEmptyInitializer)
+
+grid = Grid(5, 5, cellInitializer: gliderInitializer)
+print (grid.description)
+
+for nextGrid in grid { print ("\(nextGrid.description)\n") }
+
+let theEnd = "The End"
 

@@ -10,7 +10,8 @@ import UIKit
 
 @IBDesignable class GridView: UIView {
     
-    @IBInspectable var size:Int = 5
+    @IBInspectable var size:Int = 15
+    
     @IBInspectable var livingColor : UIColor = UIColor.green
     @IBInspectable var emptyColor : UIColor = UIColor.darkGray
     @IBInspectable var bornColor : UIColor = UIColor(red:0.0, green:1.0, blue:0.0, alpha:0.6)
