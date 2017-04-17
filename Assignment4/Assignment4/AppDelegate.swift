@@ -4,7 +4,6 @@
 //
 //  Created by Van Simmons on 1/15/17.
 //  Copyright © 2017 Harvard Division of Continuing Education. All rights reserved.
-//  AppIcon source: https://icons8.com/free-ios-7-icons-in-vector/
 
 import UIKit
 

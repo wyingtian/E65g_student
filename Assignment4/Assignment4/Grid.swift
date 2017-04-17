@@ -3,6 +3,13 @@
 //
 import Foundation
 
+public protocol GridProtocol{
+    init(_ rows: Int, _ cols: Int, cellInitializer:(Position) -> CellState)
+    subscript (pos: Position) -> CellState {get set}
+    func next() -> Self
+}
+
+
 public typealias Position = (row: Int, col: Int)
 public typealias PositionSequence = [Position]
 
@@ -23,16 +30,23 @@ public func positionSequence (from: Position, to: Position) -> PositionSequence 
 }
 
 
-
 public struct Cell {
     var position = Position(row:0, col:0)
     var state = CellState.empty
 }
 
-public struct Grid : GridViewDataSource {
+public struct Grid : GridViewDataSource, GridProtocol {
+    
     private var _cells: [[Cell]]
     fileprivate var modulus: Position { return Position(_cells.count, _cells[0].count) }
     
+    public func getCells() -> [[Cell]]{
+        return _cells
+    }
+    
+    public func getGridSize() -> Int{
+        return _cells.count
+    }
     // Get and Set cell states by position
     public subscript (pos: Position) -> CellState {
         get { let pos = normalize(position: pos, to: modulus); return _cells[pos.row][pos.col].state }
@@ -48,7 +62,7 @@ public struct Grid : GridViewDataSource {
         positions = positionSequence(from: Position(0,0), to: Position(rows, cols))
         positions.forEach { _cells[$0.row][$0.col].position = $0; self[$0] = cellInitializer($0) }
     }
-    
+  
     private static let offsets: [Position] = [
         (row: -1, col:  -1), (row: -1, col:  0), (row: -1, col:  1),
         (row:  0, col:  -1),                     (row:  0, col:  1),
@@ -154,6 +168,58 @@ extension Grid: Sequence {
     }
 }
 
+
+public struct GridPosition: Equatable{
+    var row: Int
+    var col: Int
+    
+    public static func == (lhs: GridPosition, rhs: GridPosition) -> Bool{
+        return (lhs.row == rhs.row && lhs.col == rhs.col)
+    }
+}
+
+public struct GridSize{
+    var rows: Int
+    var cols: Int
+}
+
+public enum CellState: String {
+    case alive = "alive"
+    case empty = "empty"
+    case born = "born"
+    case died = "died"
+    public func description() -> String {
+        switch self{
+        case .alive:
+            return rawValue
+        case .empty:
+            return rawValue
+        case .born:
+            return rawValue
+        case .died:
+            return rawValue
+        }
+    }
+    public func allValues() -> Array<String>{
+        return ["alive", "empty", "born", "died"]
+    }
+    public func toggle(_ value: CellState) -> CellState{
+        switch value{
+        case .alive, .born:
+            return .empty
+        case .died, .empty:
+            return .alive
+        }
+    }
+    public var isAlive: Bool {
+        switch self {
+        case .alive, .born: return true
+        default: return false
+        }
+    }
+}
+
+
 func gliderInitializer(row: Int, col: Int) -> CellState {
     switch (row, col) {
     case (0, 1), (1, 2), (2, 0), (2, 1), (2, 2): return .alive
@@ -165,6 +231,3 @@ func allEmptyInitializer(row: Int, col: Int) -> CellState {
     default: return .empty
     }
 }
-//var gv = GridView()
-//var theGrid = Grid(gv.getSize(), gv.getSize(), cellInitializer:allEmptyInitializer)
-

@@ -8,6 +8,11 @@
 
 import UIKit
 
+public protocol GridViewDataSource {
+    subscript (pos: Position) -> CellState { get set }
+    func getGridSize() -> Int
+}
+
 @IBDesignable class GridView: UIView {
     
     @IBInspectable var size:Int = 10
@@ -17,19 +22,13 @@ import UIKit
     @IBInspectable var diedColor : UIColor = UIColor(white:0.333,alpha:0.6)
     @IBInspectable var gridColor : UIColor = UIColor.black
     @IBInspectable var gridWith: CGFloat = 0.1
+    
     var theGrid: GridViewDataSource?
 
-//    
-//    func setGrid(_ newGrid:Grid){
-//        theGrid = newGrid
-//    }
-    func getSize() -> Int{
-        return size
-    }
     override func draw(_ rect: CGRect) {
         let size = CGSize(
-            width: rect.size.width / CGFloat(self.size),
-            height: rect.size.height / CGFloat(self.size)
+            width: rect.size.width / CGFloat((self.size)),
+            height: rect.size.height / CGFloat((self.size))
         )
        
         let base = rect.origin
@@ -117,7 +116,6 @@ import UIKit
         lastTouchedPosition = nil
     }
     
-  
     var lastTouchedPosition: GridPosition?
     
     func process(touches: Set<UITouch>) -> GridPosition? {
@@ -149,25 +147,4 @@ import UIKit
         
         return GridPosition(row: Int(row), col: Int(col))
     }
- //   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        if let touch = touches.first {
-//            let xPos = floor( touch.location(in:self).x / (self.bounds.size.width / CGFloat(self.size)))
-//            
-//            let yPos = floor( touch.location(in:self).y / (self.bounds.size.height / CGFloat(self.size)))
-//            
-//            let p = (Int(xPos),Int(yPos))
-//            if theGrid != nil {
-//                theGrid![p] = theGrid![p].toggle(theGrid![p])
-//            }
-//            setNeedsDisplay()
-//        }
-//        super.touchesBegan(touches, with: event)
-    }
-    
-//    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-//    }
-//    
-//    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-//    }
-    
-//}
+}

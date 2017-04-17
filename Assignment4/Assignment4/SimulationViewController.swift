@@ -8,39 +8,62 @@
 
 import UIKit
 
-class SimulationViewController: UIViewController, UITextFieldDelegate {
-    @IBOutlet weak var buttonLabel: UIButton!
-    @IBOutlet weak var GridView: GridView!
-    var theGrid:Grid?
-    var timer:Timer?
+class SimulationViewController: UIViewController, GridViewDataSource, EngineDelegate {
+    @IBOutlet weak var gridView: GridView!
+    var engine:StandardEngine!
+    var timer: Timer?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        let size = GridView.size
-        theGrid = Grid(size, size, cellInitializer: gliderInitializer)
-        GridView.theGrid = theGrid
-    }
-
-    @IBAction func startGrid(_ sender: Any) {
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {(t:Timer) in
-            self.theGrid = self.GridView.theGrid as? Grid
-            self.theGrid = self.theGrid!.next()
-            self.GridView.theGrid = self.theGrid
-            self.GridView.setNeedsDisplay()
+        // get the singleton engine from standardEngine class
+        engine = StandardEngine.engine
+        
+        // set the griddatasource of the gridview to be this griddatasource
+        gridView.theGrid = self
+        
+        // set delegate to recieve notification from standard engine
+        engine.delegate = self
+        
+        gridView.size = engine.theGrid.getGridSize()
+       
+        // add observer to get notification from standard engine
+        let nc = NotificationCenter.default
+        let name = Notification.Name(rawValue: "EngineUpdate")
+        nc.addObserver(
+            forName: name,
+            object: nil,
+            queue: nil) { (n) in
+                self.gridView.size = self.engine.theGrid.getGridSize()
+                self.gridView.setNeedsDisplay()
         }
     }
+
+    
+    @IBAction func sizeStepper(_ sender: UIStepper) {
+        engine.theGrid = Grid(Int(sender.value), Int(sender.value))
+        gridView.size = engine.theGrid.getGridSize()
+    }
+   
+    
+   // push step button to make the grid to change at 1second per state
     @IBAction func nextGrid(_ sender: Any) {
-        theGrid = GridView.theGrid as? Grid
-        theGrid = theGrid!.next()
-        GridView.theGrid = theGrid
-        GridView.setNeedsDisplay()
+        engine.step()
+        gridView.setNeedsDisplay()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
+    
+    // implementation of EngineDelegate protocol
+    func engineDidUpdate(withGrid: GridProtocol){
+        self.gridView.setNeedsDisplay()
     }
     
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        
+    // implementation of GridViewDataSource protocol
+    public subscript (pos: Position) -> CellState {
+        get {  return engine.theGrid[pos] }
+        set {  engine.theGrid[pos] = newValue }
+    }
+    public func getGridSize() -> Int{
+        return engine.theGrid.getGridSize()
     }
 }
 
