@@ -37,6 +37,26 @@ class SimulationViewController: UIViewController, GridViewDataSource, EngineDele
                 self.gridView.setNeedsDisplay()
         }
     }
+    
+    @IBAction func reset(_ sender: Any) {
+        for i in 0..<self.gridView.size {
+            for j in 0..<self.gridView.size {
+                engine.theGrid[(i, j)] = CellState.empty
+            }
+        }
+        self.gridView.setNeedsDisplay()
+        // Whenever the grid is created or changed publish the grid object using an NSNotification.
+        let nc = NotificationCenter.default
+        let name = Notification.Name(rawValue: "EngineUpdate")
+        let n = Notification(name: name,
+                             object: nil,
+                             userInfo: ["engine" : self])
+        nc.post(n)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.isNavigationBarHidden = false
+    }
 
     
     @IBAction func sizeStepper(_ sender: UIStepper) {

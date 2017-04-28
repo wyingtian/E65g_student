@@ -15,7 +15,7 @@ public protocol GridViewDataSource {
 
 @IBDesignable class GridView: UIView {
     
-    @IBInspectable var size:Int = 10
+    @IBInspectable var size:Int = 60
     @IBInspectable var livingColor : UIColor = UIColor.green
     @IBInspectable var emptyColor : UIColor = UIColor.darkGray
     @IBInspectable var bornColor : UIColor = UIColor(red:0.0, green:1.0, blue:0.0, alpha:0.6)
@@ -114,6 +114,13 @@ public protocol GridViewDataSource {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         lastTouchedPosition = nil
+        // Whenever the grid is created or changed publish the grid object using an NSNotification.
+        let nc = NotificationCenter.default
+        let name = Notification.Name(rawValue: "EngineUpdate")
+        let n = Notification(name: name,
+                             object: nil,
+                             userInfo: ["engine" : self])
+        nc.post(n)
     }
     
     var lastTouchedPosition: GridPosition?
@@ -121,12 +128,9 @@ public protocol GridViewDataSource {
     func process(touches: Set<UITouch>) -> GridPosition? {
         guard touches.count == 1 else { return nil }
         let pos = convert(touch: touches.first!)
-        
-        //************* IMPORTANT ****************
         guard lastTouchedPosition?.row != pos.row
             || lastTouchedPosition?.col != pos.col
             else { return pos }
-        //****************************************
         
         if theGrid != nil {
             theGrid![(Int(pos.row),Int(pos.col))] = theGrid![(Int(pos.row),Int(pos.col))].isAlive ? .empty : .alive

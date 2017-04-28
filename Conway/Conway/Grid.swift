@@ -92,6 +92,7 @@ public struct Grid : GridViewDataSource, GridProtocol {
         positions.forEach { nextGrid[$0] = self.nextState(of: $0) }
         return nextGrid
     }
+
 }
 
 public extension Grid {

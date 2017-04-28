@@ -38,7 +38,7 @@ class StandardEngine: EngineProtocol {
     
     //Create a singleton of StandardEngine in a lazy manner
     //It creates a grid of size 10x10 by default
-    static var engine: StandardEngine = StandardEngine(size: 10)
+    static var engine: StandardEngine = StandardEngine(size: 60)
     
     var theGrid: Grid
     var delegate: EngineDelegate?
@@ -63,8 +63,7 @@ class StandardEngine: EngineProtocol {
     }
     
     required init(size: Int) {
-        self.theGrid = Grid(size, size, cellInitializer: gliderInitializer )
-
+        self.theGrid = Grid(size, size, cellInitializer: allEmptyInitializer )
     }
     
     func step() {

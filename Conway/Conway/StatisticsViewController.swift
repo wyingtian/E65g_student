@@ -24,7 +24,7 @@ class StatisticsViewController: UIViewController, EngineDelegate {
     var engine:StandardEngine!
     
     override func viewDidLoad() {
-        super.viewDidLoad()
+       
         // get the singleton engine from standardEngine class
         engine = StandardEngine.engine
         engine.delegate = self
@@ -41,12 +41,9 @@ class StatisticsViewController: UIViewController, EngineDelegate {
                 self.numEmptyCell.text = "Empty:  " + countArray[3]
                 self.statisticView.setNeedsDisplay()
         }
+        super.viewDidLoad()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-    }
-    
     // implementation of EngineDelegate protoco
     func engineDidUpdate(withGrid: GridProtocol){
         var countArray = self.engine.countCellState()
