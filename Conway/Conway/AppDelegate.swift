@@ -14,17 +14,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var pattern:[[Int]] = []
     var userDefaults: UserDefaults?
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        
-         let file = "file.txt"
+        let file = "data"
         if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
             
             let path = dir.appendingPathComponent(file)
-            
-            //reading
+
             do {
                 let data = try String(contentsOf: path, encoding: String.Encoding.utf8)
-                            let json = convertToDictionary(text: data)
+                let json = convertToDictionary(text: data)
                 if let data_list = json as? NSArray  {
                     if let name_obj = data_list[0] as? NSDictionary{
                         if let array = name_obj["saved"] as? [[Int]]{
@@ -34,10 +31,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             
             }
-            catch {/* error handling here */}
+            catch {
+                print("Error: Reading file")
+            }
         }
-        
-        
         userDefaults = UserDefaults.standard
         userDefaults?.setValue(pattern, forKey: "pattern")
         userDefaults?.synchronize()

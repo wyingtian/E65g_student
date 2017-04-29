@@ -152,7 +152,6 @@ class InstrumentationViewController: UIViewController, EngineDelegate, UITableVi
     
     @IBAction func setSize(_ sender: UITextField) {
         if Int(sender.text!) != nil {
-            //engine.theGrid = Grid(Int(sender.text!)!, Int(sender.text!)!)
             sizeStepper.value = Double(sizeInput.text!)!
         }
         let nb = NotificationCenter.default

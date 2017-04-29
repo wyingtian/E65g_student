@@ -71,7 +71,6 @@ class SimulationViewController: UIViewController, GridViewDataSource, EngineDele
             }
         }
         
-        
         let alertController = UIAlertController(title: "Pattern Name?", message: "Please input your pattern name:", preferredStyle: .alert)
         
         let confirmAction = UIAlertAction(title: "Confirm", style: .default) { (_) in
@@ -106,18 +105,16 @@ class SimulationViewController: UIViewController, GridViewDataSource, EngineDele
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         appDelegate.pattern = self.gridStateData!
         
-        let file = "file.txt" //this is the file. we will write to and read from it
         
-        let text = "[{ \"saved\" : \(gridStateData!.description)}]" //just a text
+        let file = "data"
+        let text = "[{ \"saved\" : \(gridStateData!.description)}]"
         if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-            
             let path = dir.appendingPathComponent(file)
-            
-            //writing
             do {
                 try text.write(to: path, atomically: false, encoding: String.Encoding.utf8)
             }
-            catch {/* error handling here */}
+            catch {
+            }
         }
     }
     
