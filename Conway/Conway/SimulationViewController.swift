@@ -12,9 +12,11 @@ class SimulationViewController: UIViewController, GridViewDataSource, EngineDele
     @IBOutlet weak var gridView: GridView!
     var engine:StandardEngine!
     var timer: Timer?
-    
+    // array representation of the grid state
+    var gridStateData:[[Int]]?
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         // get the singleton engine from standardEngine class
         engine = StandardEngine.engine
         
@@ -36,6 +38,49 @@ class SimulationViewController: UIViewController, GridViewDataSource, EngineDele
                 self.gridView.size = self.engine.theGrid.getGridSize()
                 self.gridView.setNeedsDisplay()
         }
+    }
+    @IBAction func SaveToTableView(_ sender: Any) {
+        
+        gridStateData = []
+        for i in 0..<self.gridView.size {
+            for j in 0..<self.gridView.size {
+                if engine.theGrid[(i, j)] == CellState.alive || engine.theGrid[(i, j)] ==  CellState.born  {
+                    gridStateData?.append([i,j])
+                }
+            }
+        }
+        
+        
+        let alertController = UIAlertController(title: "Pattern Name?", message: "Please input your pattern name:", preferredStyle: .alert)
+        
+        let confirmAction = UIAlertAction(title: "Confirm", style: .default) { (_) in
+            if let field = alertController.textFields?[0] {
+                if let text = field.text {
+                    if !InstrumentationViewController.tableData.contains(text){
+                        InstrumentationViewController.tableData.append(text)
+                        InstrumentationViewController.gridStateDataDict[text] = self.gridStateData
+                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "load"), object: nil)
+
+                    }else{
+                        let nameTakenAlert = UIAlertController(title: "Error", message:
+                            "\"\(text)\" already exsits", preferredStyle: UIAlertControllerStyle.alert)
+                        nameTakenAlert.addAction(UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.default,handler: nil))
+                        self.present(nameTakenAlert, animated: true, completion: nil)
+                    }
+                }
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
+        
+        alertController.addTextField { (textField) in
+            textField.placeholder = ""
+        }
+        
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
     }
     
     @IBAction func reset(_ sender: Any) {

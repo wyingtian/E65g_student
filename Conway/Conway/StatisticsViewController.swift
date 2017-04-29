@@ -28,6 +28,12 @@ class StatisticsViewController: UIViewController, EngineDelegate {
         // get the singleton engine from standardEngine class
         engine = StandardEngine.engine
         engine.delegate = self
+        var countArray = self.engine.countCellState()
+        self.numLivingCell.text = "Living:  " + countArray[0]
+        self.numBornCell.text = "Born:  " + countArray[1]
+        self.numDiedCell.text = "Died:  " + countArray[2]
+        self.numEmptyCell.text = "Empty:  " + countArray[3]
+
         let nc = NotificationCenter.default
         let name = Notification.Name(rawValue: "EngineUpdate")
         nc.addObserver(

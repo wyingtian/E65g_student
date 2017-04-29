@@ -17,12 +17,12 @@ class InstrumentationViewController: UIViewController, EngineDelegate, UITableVi
     // the switch control grid to be on and off
     @IBOutlet weak var mySwitch: UISwitch!
     // an array has all the title name of json data
-    var tableData:[String] = []
-    //var gridStateData:[[[Int]]] = []
+    static var tableData:[String] = []
     // a diciontary pased from json data, key is the title name, value is an array of cell positions(pos are array of Int)
-    var gridStateDataDict:[String: [[Int]]] = [:]
-    var engine: StandardEngine!
+    static var gridStateDataDict:[String: [[Int]]] = [:]
     
+    var engine: StandardEngine!
+
     override func viewDidLoad() {
         
         // make the slider vertical
@@ -38,11 +38,56 @@ class InstrumentationViewController: UIViewController, EngineDelegate, UITableVi
         
         // default swith state is off
         mySwitch.setOn(false, animated: true)
+        NotificationCenter.default.addObserver(self, selector: #selector(do_table_refresh), name: NSNotification.Name(rawValue: "load"), object: nil)
         
-        get_data_from_url("https://dl.dropboxusercontent.com/u/7544475/S65g.json")
     }
     override func viewWillAppear(_ animated: Bool) {
-        navigationController?.isNavigationBarHidden = true
+        navigationController?.isNavigationBarHidden = false
+        let addBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(InstrumentationViewController.addRowItem))
+        navigationItem.rightBarButtonItem = addBarButton
+        
+        let addJsonButton = UIBarButtonItem(title: "Load Json", style: .plain, target: self, action: #selector(InstrumentationViewController.loadJson))
+        navigationItem.leftBarButtonItem = addJsonButton
+    }
+    
+    func loadJson(){
+        get_data_from_url("https://dl.dropboxusercontent.com/u/7544475/S65g.json")
+
+    }
+    func addRowItem(){
+        
+        let alertController = UIAlertController(title: "Pattern Name?", message: "Please input your pattern name:", preferredStyle: .alert)
+        
+        let confirmAction = UIAlertAction(title: "Confirm", style: .default) { (_) in
+            if let field = alertController.textFields?[0] {
+                if let text = field.text {
+                    if !InstrumentationViewController.tableData.contains(text){
+                        InstrumentationViewController.tableData.append(text)
+                        InstrumentationViewController.gridStateDataDict[text] = []
+                        self.tableView.beginUpdates()
+                        self.tableView.insertRows(at: [IndexPath(row: InstrumentationViewController.tableData.count-1, section: 0)], with: .automatic)
+                        self.tableView.endUpdates()
+                    }else{
+                        let nameTakenAlert = UIAlertController(title: "Error", message:
+                            "\"\(text)\" already exsits", preferredStyle: UIAlertControllerStyle.alert)
+                        nameTakenAlert.addAction(UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.default,handler: nil))
+                        self.present(nameTakenAlert, animated: true, completion: nil)
+                    }
+                }
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
+        
+        alertController.addTextField { (textField) in
+            textField.placeholder = ""
+        }
+        
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+        
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -50,14 +95,13 @@ class InstrumentationViewController: UIViewController, EngineDelegate, UITableVi
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tableData.count
+        return InstrumentationViewController.tableData.count
     }
-    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "basicCell", for: indexPath)
         let label = cell.contentView.subviews.first as! UILabel
-        label.text = tableData[indexPath.item]
+        label.text = InstrumentationViewController.tableData[indexPath.item]
         return cell
     }
 
@@ -93,11 +137,12 @@ class InstrumentationViewController: UIViewController, EngineDelegate, UITableVi
         let backItem = UIBarButtonItem()
         backItem.title = "Cancel"
         navigationItem.backBarButtonItem = backItem
+
         
         let indexPath = tableView.indexPathForSelectedRow
         if let indexPath = indexPath {
-            let titleName = tableData[indexPath.row]
-            let gridStateData = gridStateDataDict[titleName]
+            let titleName = InstrumentationViewController.tableData[indexPath.row]
+            let gridStateData = InstrumentationViewController.gridStateDataDict[titleName]
             if let vc = segue.destination as? GridEditorViewController {
                 vc.titleName = titleName
                 vc.gridStateData = gridStateData
@@ -205,8 +250,15 @@ class InstrumentationViewController: UIViewController, EngineDelegate, UITableVi
             for i in 0 ..< data_list.count{
                 if let shape_obj = shape_list[i] as? NSDictionary{
                     if let title = shape_obj["title"] as? String , let gridState = shape_obj["contents"] as? [[Int]]{
-                        gridStateDataDict[title] = gridState
-                        tableData.append(title)
+                        if !InstrumentationViewController.tableData.contains(title){
+                            InstrumentationViewController.tableData.append(title)
+                            InstrumentationViewController.gridStateDataDict[title] = gridState
+                        }else{
+                            let nameTakenAlert = UIAlertController(title: "Error", message:
+                                "\"\(title)\" already exsits", preferredStyle: UIAlertControllerStyle.alert)
+                            nameTakenAlert.addAction(UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.default,handler: nil))
+                            self.present(nameTakenAlert, animated: true, completion: nil)
+                        }
                     }
                 }
             }
