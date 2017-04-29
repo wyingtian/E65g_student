@@ -11,22 +11,48 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    let strings = [
-        "born": [[0,0], [0,1]],
-        "alive": [[1,0], [1,1]],
-        "died": [[2,0], [2,1]]
-    ]
-
+    var pattern:[[Int]] = []
+    var userDefaults: UserDefaults?
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        let defaults = UserDefaults.standard
-        defaults.set(strings, forKey: "strings")
-        let recoveredStrings = defaults.object(forKey: "strings")
-        print(recoveredStrings)
+         let file = "file.txt"
+        if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            
+            let path = dir.appendingPathComponent(file)
+            
+            //reading
+            do {
+                let data = try String(contentsOf: path, encoding: String.Encoding.utf8)
+                            let json = convertToDictionary(text: data)
+                if let data_list = json as? NSArray  {
+                    if let name_obj = data_list[0] as? NSDictionary{
+                        if let array = name_obj["saved"] as? [[Int]]{
+                            pattern = array
+                        }
+                    }
+                }
+            
+            }
+            catch {/* error handling here */}
+        }
+        
+        
+        userDefaults = UserDefaults.standard
+        userDefaults?.setValue(pattern, forKey: "pattern")
+        userDefaults?.synchronize()
         return true
     }
-
+    func convertToDictionary(text: String) -> Any? {
+        if let data = text.data(using: .utf8) {
+            do {
+                return try JSONSerialization.jsonObject(with: data, options: [])
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        return nil
+    }
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.

@@ -28,6 +28,13 @@ class SimulationViewController: UIViewController, GridViewDataSource, EngineDele
         
         gridView.size = engine.theGrid.getGridSize()
        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let userDefaults = appDelegate.userDefaults
+        if userDefaults?.value(forKey: "pattern") != nil {
+            // do something here when a pattern exists
+            loadGridStateData(gridStateData:userDefaults?.value(forKey: "pattern") as? [[Int]])
+        }
+        
         // add observer to get notification from standard engine
         let nc = NotificationCenter.default
         let name = Notification.Name(rawValue: "EngineUpdate")
@@ -39,6 +46,20 @@ class SimulationViewController: UIViewController, GridViewDataSource, EngineDele
                 self.gridView.setNeedsDisplay()
         }
     }
+    
+    func loadGridStateData(gridStateData:[[Int]]?) {
+        for i in 0..<self.gridView.size {
+            for j in 0..<self.gridView.size {
+                engine.theGrid[(i, j)] = CellState.empty
+            }
+        }
+        for pos in gridStateData! {
+            engine.theGrid[(pos[0], pos[1])] = CellState.born
+        }
+        
+        self.gridView.setNeedsDisplay()
+    }
+    
     @IBAction func SaveToTableView(_ sender: Any) {
         
         gridStateData = []
@@ -81,6 +102,23 @@ class SimulationViewController: UIViewController, GridViewDataSource, EngineDele
         alertController.addAction(cancelAction)
         
         self.present(alertController, animated: true, completion: nil)
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        appDelegate.pattern = self.gridStateData!
+        
+        let file = "file.txt" //this is the file. we will write to and read from it
+        
+        let text = "[{ \"saved\" : \(gridStateData!.description)}]" //just a text
+        if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            
+            let path = dir.appendingPathComponent(file)
+            
+            //writing
+            do {
+                try text.write(to: path, atomically: false, encoding: String.Encoding.utf8)
+            }
+            catch {/* error handling here */}
+        }
     }
     
     @IBAction func reset(_ sender: Any) {
